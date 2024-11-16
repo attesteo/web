@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ethers } from 'ethers';
-	import { createPublicClient, http, Address } from 'viem';
+	import { createPublicClient, http } from 'viem';
+	import type { Address } from 'viem';
 	import { optimism } from 'viem/chains';
 
 	// Constants for Sign Protocol and OP token
@@ -13,7 +14,15 @@
 		transport: http()
 	});
 
-	let messages = $state([
+	interface Message {
+		id: number;
+		author: string;
+		content: string;
+		timestamp: Date;
+		attestationUID: string | null;
+	}
+
+	let messages = $state<Message[]>([
 		{
 			id: 1,
 			author: '0x1234...5678',
@@ -128,6 +137,11 @@
 			// Create attestation before posting
 			const attestationUID = await createAttestation(walletAddress);
 
+			if (!attestationUID) {
+				alert('Failed to create attestation. Please try again.');
+				return;
+			}
+
 			messages = [
 				...messages,
 				{
@@ -149,10 +163,12 @@
 
 <div class="mx-auto max-w-3xl p-6">
 	<div class="mb-8">
-		<h1 class="mb-2 text-3xl font-bold">Discussion: Getting Started with Svelte</h1>
-		<p class="text-gray-600">Join the conversation about Svelte development</p>
+		<h1 class="mb-2 text-3xl font-bold">OP Grants Council Discussion</h1>
+		<p class="text-gray-600">
+			Join the conversation about Optimism's grant proposals and initiatives
+		</p>
 		<p class="mt-2 text-sm text-gray-500">
-			* Requires at least 1 OP token on Optimism to participate
+			* Requires at least 1 OP token on Optimism to participate in discussions
 		</p>
 	</div>
 
